@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Clima</string>
+
+    <!-- Splash screen activity -->
+    <string name="lbl_facebook">Facebook</string>
+    <string name="lbl_google">Google</string>
+    <string name="lbl_omit">Omitir</string>
+
+</resources>
