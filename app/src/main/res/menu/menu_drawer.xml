@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The id attribute represents physically a line that separates the groups -->
+    <!-- If you doesn't have it there isn't separations -->
+    <group
+        android:id="@+id/group_one"
+        android:checkableBehavior="single">
+    </group>
+</menu>

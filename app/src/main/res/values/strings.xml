@@ -6,4 +6,10 @@
     <string name="lbl_google">Google</string>
     <string name="lbl_omit">Omitir</string>
 
+    <!-- Navigation header -->
+    <string name="lbl_guest">Invitado del clima</string>
+
+    <!-- Menu -->
+    <string name="open_drawer">Navigation Drawer is Open</string>
+    <string name="close_drawer">Navigation Drawer is Close</string>
 </resources>

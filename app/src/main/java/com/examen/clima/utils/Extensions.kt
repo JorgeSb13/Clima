@@ -8,10 +8,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.examen.clima.App
 import com.examen.clima.R
+
+fun toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) =
+    Toast.makeText(App.context, message, duration).show()
+
+fun toast(resourceId: Int, duration: Int = Toast.LENGTH_SHORT) =
+    Toast.makeText(App.context, resourceId, duration).show()
 
 fun ViewGroup.inflate(layoutId: Int) = LayoutInflater.from(context).inflate(layoutId, this, false)!!
 
@@ -75,3 +83,7 @@ fun simpleAlertDialog(context: Context, title: String, message: String, buttonTe
         .setPositiveButton(buttonText, listener)
         .setCancelable(false).show()
 }
+
+fun Activity.transitionBack() = overridePendingTransition(R.anim.animation_right_in, R.anim.animation_right_out)
+fun Activity.transitionRight() = overridePendingTransition(R.anim.animation_right_in, R.anim.animation_right_out)
+fun Activity.transitionLeft() = overridePendingTransition(R.anim.animation_left_in, R.anim.animation_left_out)

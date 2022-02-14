@@ -7,4 +7,5 @@
     <color name="comp">#FFffee58</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="white_alpha">#AFFFFFFF</color>
 </resources>
