@@ -31,9 +31,38 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:3750664304265355730",
+      "lastPropertyId": "4:8323997344438203286",
+      "name": "Usuario",
+      "properties": [
+        {
+          "id": "1:8831343640955879800",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5806913537168238292",
+          "name": "Nombre",
+          "type": 9
+        },
+        {
+          "id": "3:1326191847555913433",
+          "name": "Correo",
+          "type": 9
+        },
+        {
+          "id": "4:8323997344438203286",
+          "name": "Red social",
+          "type": 5
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:3679024025908515344",
+  "lastEntityId": "2:3750664304265355730",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

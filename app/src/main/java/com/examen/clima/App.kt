@@ -6,6 +6,7 @@ import android.util.Log
 import com.examen.clima.entities.MyObjectBox
 import com.examen.clima.entities.User
 import com.examen.clima.entities.Weather
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import io.objectbox.Box
 import io.objectbox.BoxStore
 import io.objectbox.android.AndroidObjectBrowser
@@ -24,6 +25,7 @@ class App : Application() {
         var shareInstance: App? = null
         var prefs: PreferencesHelper? = null
         var boxStore: BoxStore? = null
+        var mGoogleSignInClient: GoogleSignInClient? = null
 
         // ----- WAREHOUSE -----
         var userBox: Box<User>? = null

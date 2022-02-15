@@ -1,5 +1,6 @@
 package com.examen.clima.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -9,13 +10,20 @@ import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.examen.clima.App.Companion.mGoogleSignInClient
 import com.examen.clima.R
 import com.examen.clima.adapters.WeatherAdapter
 import com.examen.clima.databinding.ActivityMainBinding
 import com.examen.clima.databinding.NavHeaderBinding
 import com.examen.clima.entities.Weather
 import com.examen.clima.prefHelper
+import com.examen.clima.userBox
+import com.examen.clima.utils.Constants.Companion.FACEBOOK
+import com.examen.clima.utils.Constants.Companion.GOOGLE
+import com.examen.clima.utils.alertDialog
+import com.examen.clima.utils.goToActivity
 import com.examen.clima.utils.toast
+import com.examen.clima.utils.transitionRight
 import com.examen.clima.weatherBox
 import com.google.android.material.navigation.NavigationView
 import com.projects.mylibrary.activities.ToolbarActivity
@@ -45,7 +53,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         mLayoutManager = LinearLayoutManager(this)
         recycler = binding.recycler
 
-        loadCuts()
+        loadWeather()
         // -----------------------------
     }
 
@@ -70,7 +78,14 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         if (prefHelper.hasEntered && prefHelper.isLogged) {
             // Button for logout when you has a session
             navBinding.ivLogout.visibility = VISIBLE
-            name.text = "Jorge Arturo Stone Beltrán"
+
+            val user = userBox.query().build().findFirst()
+            name.text = user!!.name
+
+            when (user.socialMedia) {
+                GOOGLE -> navBinding.ivSocialMedia.setImageResource(R.drawable.google_logo)
+                FACEBOOK-> navBinding.ivSocialMedia.setImageResource(R.drawable.facebook_logo)
+            }
 
         } else if (prefHelper.hasEntered) {
             // Button for log in a session when you're as a guest
@@ -87,14 +102,14 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         // ----------------------------------------------
 
         navBinding.ivLogin.setOnClickListener {
-            toast("Prueba login")
+            signInWithAccount()
         }
         navBinding.ivLogout.setOnClickListener {
-            toast("Prueba logout")
+            signOut()
         }
     }
 
-    private fun loadCuts() {
+    private fun loadWeather() {
         weatherList.clear()
 
         /*
@@ -134,6 +149,44 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
             // TODO Funcion de añadir nueva localizacion
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    // ----- Sign in function -----
+    private fun signInWithAccount() {
+        alertDialog(this, "Iniciar sesión", "¿Está seguro de iniciar sesión con una cuenta?", getString(R.string.accept), { _, _ ->
+            prefHelper.hasEntered = false
+            goToActivity<SplashActivity> {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            transitionRight()
+        }, getString(R.string.cancel))
+    }
+
+    // ----- Sign out function -----
+    private fun signOut() {
+        val user = userBox.query().build().findFirst()
+
+        alertDialog(this, getString(R.string.ad_sign_out_title), getString(R.string.ad_sign_out_message), getString(R.string.accept), { _, _ ->
+
+            when (user!!.socialMedia) {
+                GOOGLE -> mGoogleSignInClient!!.signOut().addOnCompleteListener(this) {
+                        clearUserInfoAndExit()
+                }
+                FACEBOOK-> clearUserInfoAndExit()
+            }
+        }, getString(R.string.cancel))
+    }
+
+    private fun clearUserInfoAndExit() {
+        // ----- Reset information -----
+        prefHelper.isLogged = false
+        prefHelper.hasEntered = false
+        userBox.removeAll()
+        // -----------------------------
+        goToActivity<SplashActivity> {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        transitionRight()
     }
     // -----------------------------
 

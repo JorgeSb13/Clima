@@ -34,7 +34,7 @@
     },
     {
       "id": "2:3750664304265355730",
-      "lastPropertyId": "2:5806913537168238292",
+      "lastPropertyId": "5:7280317104044342009",
       "name": "Usuario",
       "properties": [
         {
@@ -47,6 +47,16 @@
           "id": "2:5806913537168238292",
           "name": "Nombre",
           "type": 9
+        },
+        {
+          "id": "3:1326191847555913433",
+          "name": "Correo",
+          "type": 9
+        },
+        {
+          "id": "5:7280317104044342009",
+          "name": "Red_social",
+          "type": 5
         }
       ],
       "relations": []
@@ -60,7 +70,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    8323997344438203286
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

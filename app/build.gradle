@@ -48,6 +48,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
+    // ----- Google services -----
+    implementation 'com.google.android.gms:play-services-auth:20.1.0'
+
     // ----- ObjectBox data browser -----
     debugImplementation "io.objectbox:objectbox-android-objectbrowser:$objectboxVersion"
     releaseImplementation "io.objectbox:objectbox-android:$objectboxVersion"

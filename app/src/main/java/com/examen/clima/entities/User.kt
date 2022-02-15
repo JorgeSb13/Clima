@@ -9,5 +9,9 @@ import io.objectbox.annotation.NameInDb
 data class User(
     @Id(assignable = true) var id: Long,
     @NameInDb("Nombre")
-    var name: String
+    var name: String,
+    @NameInDb("Correo")
+    var email: String,
+    @NameInDb("Red_social")
+    var socialMedia: Int
 )

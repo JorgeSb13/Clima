@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Clima</string>
 
+    <!-- General -->
+    <string name="accept">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+
     <!-- Splash screen activity -->
     <string name="lbl_facebook">Facebook</string>
     <string name="lbl_google">Google</string>
@@ -12,4 +16,11 @@
     <!-- Menu -->
     <string name="open_drawer">Navigation Drawer is Open</string>
     <string name="close_drawer">Navigation Drawer is Close</string>
+
+    <!-- Alert dialogs -->
+    <string name="ad_error_occurred_title">Ocurrió un error</string>
+    <string name="ad_error_occurred_message">Lo sentimos no ha sido posible iniciar sesión.</string>
+    <string name="ad_sign_out_title">Cerrar sesión</string>
+    <string name="ad_sign_out_message">¿Está seguro de cerrar sesión?</string>
+
 </resources>
