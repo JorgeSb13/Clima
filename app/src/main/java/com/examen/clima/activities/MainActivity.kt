@@ -23,13 +23,11 @@ import com.examen.clima.databinding.ActivityMainBinding
 import com.examen.clima.databinding.NavHeaderBinding
 import com.examen.clima.entities.Ubi
 import com.examen.clima.entities.Weather
+import com.examen.clima.utils.*
 import com.examen.clima.utils.Constants.Companion.FACEBOOK
 import com.examen.clima.utils.Constants.Companion.GOOGLE
 import com.examen.clima.utils.Constants.Companion.LOCATION_REQ_CODE
 import com.examen.clima.utils.Constants.Companion.TAG_LOCATION
-import com.examen.clima.utils.alertDialog
-import com.examen.clima.utils.goToActivity
-import com.examen.clima.utils.transitionRight
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
@@ -73,8 +71,17 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         // Load the weather of next days
         mLayoutManager = LinearLayoutManager(this)
         recycler = binding.recycler
-
         loadWeather()
+
+        // ----- Swipe to refresh information function -----
+        binding.srlRefreshScreen.setOnRefreshListener {
+            // Refresh information in principal CardView
+            loadPrincipalCardInformation()
+            // Refresh weather information
+            loadWeather()
+
+            binding.srlRefreshScreen.isRefreshing = false
+        }
         // -----------------------------
     }
 
@@ -132,6 +139,9 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
             binding.ivLocation.visibility = VISIBLE
             binding.tvCity.text = "${ubi!!.locality}, ${ubi!!.state}"
         }
+
+        binding.tvDateTime.text = getDateTime()
+        binding.tvTimeZone.text = getTimeZone()
     }
 
     private fun loadWeather() {

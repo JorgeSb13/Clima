@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.examen.clima.App
 import com.examen.clima.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 fun toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) =
     Toast.makeText(App.context, message, duration).show()
@@ -87,3 +89,16 @@ fun simpleAlertDialog(context: Context, title: String, message: String, buttonTe
 fun Activity.transitionBack() = overridePendingTransition(R.anim.animation_right_in, R.anim.animation_right_out)
 fun Activity.transitionRight() = overridePendingTransition(R.anim.animation_right_in, R.anim.animation_right_out)
 fun Activity.transitionLeft() = overridePendingTransition(R.anim.animation_left_in, R.anim.animation_left_out)
+
+fun getDateTime(): String {
+    val day = SimpleDateFormat("EEE, d", Locale("es", "MX")) // e.g "mar., 15"
+    val monthTime = SimpleDateFormat("MMMM h:mm aa", Locale("es", "MX")) // e.g "febrero 2:33 p. m."
+    val date = Date()
+    return "${day.format(date)} de ${monthTime.format(date)}" // e.g "mar., 15 de febrero 2:33 p. m."
+}
+
+fun getTimeZone(): String {
+    val time = Calendar.getInstance().time.toString()
+    val splitTime = time.split(" ")
+    return splitTime[4] // e.g "GMT-07:00"
+}
