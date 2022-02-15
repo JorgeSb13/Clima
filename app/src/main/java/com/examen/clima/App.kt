@@ -3,6 +3,7 @@ package com.examen.clima
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.examen.clima.entities.Ubi
 import com.examen.clima.entities.MyObjectBox
 import com.examen.clima.entities.User
 import com.examen.clima.entities.Weather
@@ -16,6 +17,7 @@ val boxStore: BoxStore by lazy { App.boxStore!! }
 
 // ----- WAREHOUSE -----
 val userBox: Box<User> by lazy { App.userBox!! }
+val locationBox: Box<Ubi> by lazy { App.locationBox!! }
 val weatherBox: Box<Weather> by lazy { App.weatherBox!! }
 
 class App : Application() {
@@ -29,6 +31,7 @@ class App : Application() {
 
         // ----- WAREHOUSE -----
         var userBox: Box<User>? = null
+        var locationBox: Box<Ubi>? = null
         var weatherBox: Box<Weather>? = null
     }
 
@@ -43,6 +46,7 @@ class App : Application() {
 
         // ----- WAREHOUSE -----
         userBox = boxStore!!.boxFor(User::class.java)
+        locationBox = boxStore!!.boxFor(Ubi::class.java)
         weatherBox = boxStore!!.boxFor(Weather::class.java)
 
         //Starting ObjectBox Data Browser (ONLY FOR TEST!!!)

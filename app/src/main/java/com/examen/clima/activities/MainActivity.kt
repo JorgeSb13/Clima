@@ -1,32 +1,41 @@
 package com.examen.clima.activities
 
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Intent
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.location.Geocoder
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.VISIBLE
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.examen.clima.*
 import com.examen.clima.App.Companion.mGoogleSignInClient
-import com.examen.clima.R
 import com.examen.clima.adapters.WeatherAdapter
 import com.examen.clima.databinding.ActivityMainBinding
 import com.examen.clima.databinding.NavHeaderBinding
+import com.examen.clima.entities.Ubi
 import com.examen.clima.entities.Weather
-import com.examen.clima.prefHelper
-import com.examen.clima.userBox
 import com.examen.clima.utils.Constants.Companion.FACEBOOK
 import com.examen.clima.utils.Constants.Companion.GOOGLE
+import com.examen.clima.utils.Constants.Companion.LOCATION_REQ_CODE
+import com.examen.clima.utils.Constants.Companion.TAG_LOCATION
 import com.examen.clima.utils.alertDialog
 import com.examen.clima.utils.goToActivity
-import com.examen.clima.utils.toast
 import com.examen.clima.utils.transitionRight
-import com.examen.clima.weatherBox
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
 import com.projects.mylibrary.activities.ToolbarActivity
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -37,6 +46,11 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
     private lateinit var adapter: WeatherAdapter
     private var weatherList: ArrayList<Weather> = ArrayList()
 
+    private var ubi: Ubi? = null
+
+    // Location functionality
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -44,10 +58,17 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
         toolbarToLoad(binding.toolbar.root)
 
+        // ----- Location functionality -----
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        getLocationPermission()
+
+        // Load screen information
+        ubi = locationBox.query().build().findFirst()
+        loadPrincipalCardInformation()
+
         // Load the lateral menu
         setNavDrawer()
         setHeaderInfo()
-        // ---------------------
 
         // Load the weather of next days
         mLayoutManager = LinearLayoutManager(this)
@@ -84,7 +105,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
             when (user.socialMedia) {
                 GOOGLE -> navBinding.ivSocialMedia.setImageResource(R.drawable.google_logo)
-                FACEBOOK-> navBinding.ivSocialMedia.setImageResource(R.drawable.facebook_logo)
+                FACEBOOK -> navBinding.ivSocialMedia.setImageResource(R.drawable.facebook_logo)
             }
 
         } else if (prefHelper.hasEntered) {
@@ -95,17 +116,21 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         // ----------------------------------------------
 
         // ---- Set the information about the weather ---
-        val city = navBinding.tvCity
+        if (ubi != null) {
+            navBinding.tvCity.text = ubi!!.locality
+        }
         val temperature = navBinding.tvTemperature
         val weather = navBinding.ivWeather
-        val location = navBinding.ivLocation
         // ----------------------------------------------
 
-        navBinding.ivLogin.setOnClickListener {
-            signInWithAccount()
-        }
-        navBinding.ivLogout.setOnClickListener {
-            signOut()
+        navBinding.ivLogin.setOnClickListener { signInWithAccount() }
+        navBinding.ivLogout.setOnClickListener { signOut() }
+    }
+
+    private fun loadPrincipalCardInformation() {
+        if (ubi != null) {
+            binding.ivLocation.visibility = VISIBLE
+            binding.tvCity.text = "${ubi!!.locality}, ${ubi!!.state}"
         }
     }
 
@@ -153,12 +178,8 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
     // ----- Sign in function -----
     private fun signInWithAccount() {
-        alertDialog(this, "Iniciar sesión", "¿Está seguro de iniciar sesión con una cuenta?", getString(R.string.accept), { _, _ ->
-            prefHelper.hasEntered = false
-            goToActivity<SplashActivity> {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            transitionRight()
+        alertDialog(this, getString(R.string.ad_sign_in_title), getString(R.string.ad_sign_in_message), getString(R.string.accept), { _, _ ->
+            removeFlagsAndExitApp()
         }, getString(R.string.cancel))
     }
 
@@ -166,15 +187,22 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
     private fun signOut() {
         val user = userBox.query().build().findFirst()
 
-        alertDialog(this, getString(R.string.ad_sign_out_title), getString(R.string.ad_sign_out_message), getString(R.string.accept), { _, _ ->
+        alertDialog(
+            this,
+            getString(R.string.ad_sign_out_title),
+            getString(R.string.ad_sign_out_message),
+            getString(R.string.accept),
+            { _, _ ->
 
-            when (user!!.socialMedia) {
-                GOOGLE -> mGoogleSignInClient!!.signOut().addOnCompleteListener(this) {
+                when (user!!.socialMedia) {
+                    GOOGLE -> mGoogleSignInClient!!.signOut().addOnCompleteListener(this) {
                         clearUserInfoAndExit()
+                    }
+                    FACEBOOK -> clearUserInfoAndExit()
                 }
-                FACEBOOK-> clearUserInfoAndExit()
-            }
-        }, getString(R.string.cancel))
+            },
+            getString(R.string.cancel)
+        )
     }
 
     private fun clearUserInfoAndExit() {
@@ -188,7 +216,69 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         }
         transitionRight()
     }
+
+    // ----- Location functionality -----
+    private fun getLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
+            fusedLocationProviderClient.lastLocation.addOnCompleteListener {
+                val location = it.result
+                if (location != null) locationProcess(location)
+            }
+        } else
+            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION), LOCATION_REQ_CODE)
+    }
+
+    private fun locationProcess(location: Location) {
+        try {
+            val geocoder = Geocoder(this, Locale.getDefault())
+            val address = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+
+            // Remove old information and reinsert new one
+            locationBox.removeAll()
+            locationBox.put(Ubi(0, address[0].locality, address[0].adminArea, address[0].countryName))
+
+        } catch (e: Exception) {
+            Log.w(TAG_LOCATION, getString(R.string.error_location))
+        }
+    }
     // -----------------------------
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        when (requestCode) {
+            LOCATION_REQ_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PERMISSION_GRANTED)) {
+                    // Permission is granted. Continue the action or workflow in your app.
+
+                    // Get location
+                    if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
+                        fusedLocationProviderClient.lastLocation.addOnCompleteListener {
+                            val location = it.result
+                            if (location != null) locationProcess(location)
+                        }
+                    }
+
+                } else {
+                    alertDialog(this, getString(R.string.ad_location_permission_title), getString(R.string.ad_location_permission_message), getString(R.string.accept), { _, _ ->
+                        getLocationPermission()
+                    }, getString(R.string.cancel), { _, _ ->
+                        removeFlagsAndExitApp()
+                    })
+                }
+                return
+            }
+        }
+    }
+
+    // Remove @hasEntered flag value and return to splash screen
+    private fun removeFlagsAndExitApp() {
+        prefHelper.hasEntered = false
+        goToActivity<SplashActivity> {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        transitionRight()
+    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         TODO("Not yet implemented")

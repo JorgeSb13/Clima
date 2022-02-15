@@ -20,7 +20,15 @@
     <!-- Alert dialogs -->
     <string name="ad_error_occurred_title">Ocurrió un error</string>
     <string name="ad_error_occurred_message">Lo sentimos no ha sido posible iniciar sesión.</string>
+    <string name="ad_sign_in_title">Iniciar sesión</string>
+    <string name="ad_sign_in_message">¿Está seguro de iniciar sesión con una cuenta?</string>
     <string name="ad_sign_out_title">Cerrar sesión</string>
     <string name="ad_sign_out_message">¿Está seguro de cerrar sesión?</string>
+    <string name="ad_location_permission_title">Permisos de ubicación</string>
+    <string name="ad_location_permission_message">Acceder a la ubicación del dispositivo es necesario para
+        el funcionamiento de la aplicación, acepte los permisos necesarios.</string>
+
+    <!-- Errors -->
+    <string name="error_location">Location could not be obtained</string>
 
 </resources>

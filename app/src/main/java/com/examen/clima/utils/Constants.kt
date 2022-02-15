@@ -9,6 +9,8 @@ class Constants {
         const val GOOGLE = 14
         const val FACEBOOK = 15
 
+        const val LOCATION_REQ_CODE = 44
+
         // ----- Google -----
         const val RC_SIGN_IN = 100
 
@@ -16,6 +18,9 @@ class Constants {
         const val SHARED_FILE_NAME = "share_preferences_file"
         const val KEY_HAS_ENTERED = "hasEntered"
         const val KEY_IS_LOGGED = "isLogged"
+
+        // ----- TAGs -----
+        const val TAG_LOCATION = "Location"
     }
 
 }
