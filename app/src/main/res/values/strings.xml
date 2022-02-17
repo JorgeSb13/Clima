@@ -10,12 +10,19 @@
     <string name="lbl_google">Google</string>
     <string name="lbl_omit">Omitir</string>
 
+    <!-- Main screen activity -->
+    <string name="lbl_search_location">Buscar localización</string>
+
     <!-- Navigation header -->
     <string name="lbl_guest">Invitado del clima</string>
 
     <!-- Menu -->
     <string name="open_drawer">Navigation Drawer is Open</string>
     <string name="close_drawer">Navigation Drawer is Close</string>
+
+    <!-- Loadings -->
+    <string name="loading_getting_information">Obteniendo información</string>
+    <string name="loading_searching">Buscando</string>
 
     <!-- Alert dialogs -->
     <string name="ad_error_occurred_title">Ocurrió un error</string>
@@ -30,5 +37,13 @@
 
     <!-- Errors -->
     <string name="error_location">Location could not be obtained</string>
+    <string name="error_title">Hubo un problema</string>
+    <string name="error_timeout">Tiempo de espera agotado.</string>
+    <string name="error_unexpected">Ocurrio un error inesperado.</string>
+    <string name="error_unreachable_network">No es posible acceder a internet, verifica tu conexión.</string>
+    <string name="error_unknown_host_exception">No es posible conectarse al servidor.</string>
+    <string name="error_certificate">Error de certificados.</string>
+    <string name="certificate_error_message">No es posible acceder, certificados inválidos.</string>
+    <string name="network_settings">Ir a configuración de red</string>
 
 </resources>

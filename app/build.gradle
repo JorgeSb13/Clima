@@ -19,9 +19,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            // -------- API --------
+            buildConfigField("String", "BASE_URL", '"http://api.weatherapi.com/v1/"')
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // -------- API --------
+            buildConfigField("String", "BASE_URL", '"http://api.weatherapi.com/v1/"')
         }
     }
     compileOptions {
@@ -56,6 +62,14 @@ dependencies {
     // ----- ObjectBox data browser -----
     debugImplementation "io.objectbox:objectbox-android-objectbrowser:$objectboxVersion"
     releaseImplementation "io.objectbox:objectbox-android:$objectboxVersion"
+
+    // ----- Needed for consuming APIs -----
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'           //RxAndroid
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.0'              //RxJava
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'    //GSON Converter for Retrofit
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'   //Rx Requests for Retrofit
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
 
     // ----- Others -----
     implementation project(':myLibrary')

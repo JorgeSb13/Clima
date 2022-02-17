@@ -9,10 +9,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,13 +23,18 @@ import com.examen.clima.App.Companion.mGoogleSignInClient
 import com.examen.clima.adapters.WeatherAdapter
 import com.examen.clima.databinding.ActivityMainBinding
 import com.examen.clima.databinding.NavHeaderBinding
+import com.examen.clima.entities.Forecast
 import com.examen.clima.entities.Ubi
 import com.examen.clima.entities.Weather
+import com.examen.clima.entities.WeatherCondition_
+import com.examen.clima.models.WeatherResponse
+import com.examen.clima.network.HelperUtil
 import com.examen.clima.utils.*
 import com.examen.clima.utils.Constants.Companion.FACEBOOK
 import com.examen.clima.utils.Constants.Companion.GOOGLE
 import com.examen.clima.utils.Constants.Companion.LOCATION_REQ_CODE
 import com.examen.clima.utils.Constants.Companion.TAG_LOCATION
+import com.examen.clima.viewModels.WeatherViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
@@ -38,13 +45,15 @@ import kotlin.collections.ArrayList
 class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var weatherViewModel: WeatherViewModel
 
     private lateinit var mLayoutManager: RecyclerView.LayoutManager
     private lateinit var recycler: RecyclerView
     private lateinit var adapter: WeatherAdapter
-    private var weatherList: ArrayList<Weather> = ArrayList()
+    private var forecastList: ArrayList<Forecast> = ArrayList()
 
     private var ubi: Ubi? = null
+    private lateinit var weather: Weather
 
     // Location functionality
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -56,30 +65,31 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
         toolbarToLoad(binding.toolbar.root)
 
+        // ----- Initialize ViewModel and call Observers -----
+        weatherViewModel = ViewModelProvider(this).get(WeatherViewModel::class.java)
+        attachObservers()
+
         // ----- Location functionality -----
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         getLocationPermission()
 
         // Load screen information
         ubi = locationBox.query().build().findFirst()
-        loadPrincipalCardInformation()
+        val location = ubi!!.locality.split(" ")
+        weatherViewModel.getWeather(location[0])
 
         // Load the lateral menu
         setNavDrawer()
-        setHeaderInfo()
 
         // Load the weather of next days
         mLayoutManager = LinearLayoutManager(this)
         recycler = binding.recycler
-        loadWeather()
 
         // ----- Swipe to refresh information function -----
         binding.srlRefreshScreen.setOnRefreshListener {
-            // Refresh information in principal CardView
-            loadPrincipalCardInformation()
-            // Refresh weather information
-            loadWeather()
+            binding.etSearch.text.clear()
 
+            weatherViewModel.getWeather(location[0])
             binding.srlRefreshScreen.isRefreshing = false
         }
         // -----------------------------
@@ -123,11 +133,15 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         // ----------------------------------------------
 
         // ---- Set the information about the weather ---
-        if (ubi != null) {
-            navBinding.tvCity.text = ubi!!.locality
-        }
-        val temperature = navBinding.tvTemperature
-        val weather = navBinding.ivWeather
+        if (ubi != null) navBinding.tvCity.text = ubi!!.locality
+        navBinding.tvTemperature.text = weather.temperature
+
+        // Assign day or night for the corresponding image
+        val weatherCondition = weatherConditionBox.query().equal(WeatherCondition_.id, weather.code.toLong())
+            .build().findFirst()!!
+
+        val image = if (weather.isDay == 1) "d_${weatherCondition.icon}" else "n_${weatherCondition.icon}"
+        navBinding.ivWeather.setImageResource(getImage(image))
         // ----------------------------------------------
 
         navBinding.ivLogin.setOnClickListener { signInWithAccount() }
@@ -140,26 +154,24 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
             binding.tvCity.text = "${ubi!!.locality}, ${ubi!!.state}"
         }
 
-        binding.tvDateTime.text = getDateTime()
+        val weatherCondition = weatherConditionBox.query().equal(WeatherCondition_.id, weather.code.toLong())
+            .build().findFirst()!!
+
+        binding.tvDateTime.text = dateTimeFormat(weather.date, weather.time)
         binding.tvTimeZone.text = getTimeZone()
+        binding.tvTemperature.text = weather.temperature
+        binding.tvWeatherCondition.text = weatherCondition.condition
+
+        // Assign day or night for the corresponding image
+        val image = if (weather.isDay == 1) "d_${weatherCondition.icon}" else "n_${weatherCondition.icon}"
+        binding.ivWeather.setImageResource(getImage(image))
     }
 
     private fun loadWeather() {
-        weatherList.clear()
+        forecastList.clear()
 
-        /*
-        weatherBox.put(Weather(0, "Lunes", "Nublado", "25°/ 9°"))
-        weatherBox.put(Weather(0, "Martes", "Soleado", "34°/ 15°"))
-        weatherBox.put(Weather(0, "Miercoles", "Soleado", "32°/ 12°"))
-        weatherBox.put(Weather(0, "Jueves", "Lluvioso", "23°/ 7°"))
-        weatherBox.put(Weather(0, "Viernes", "Nublado", "27°/ 11°"))
-        weatherBox.put(Weather(0, "Sabado", "Soleado", "37°/ 16°"))
-        weatherBox.put(Weather(0, "Domingo", "Nublado", "24°/ 8°"))
-         */
-
-        for (weather in weatherBox.all) {
-            weatherList.add(weather)
-        }
+        for (forecast in forecastBox.all)
+            forecastList.add(forecast)
 
         setRecyclerView()
     }
@@ -168,7 +180,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         recycler.setHasFixedSize(true)
         recycler.itemAnimator = DefaultItemAnimator()
         recycler.layoutManager = mLayoutManager
-        adapter = (WeatherAdapter(weatherList))
+        adapter = (WeatherAdapter(forecastList))
         recycler.adapter = adapter
     }
 
@@ -270,7 +282,8 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
                     }
 
                 } else {
-                    alertDialog(this, getString(R.string.ad_location_permission_title), getString(R.string.ad_location_permission_message), getString(R.string.accept), { _, _ ->
+                    alertDialog(this, getString(R.string.ad_location_permission_title),
+                        getString(R.string.ad_location_permission_message), getString(R.string.accept), { _, _ ->
                         getLocationPermission()
                     }, getString(R.string.cancel), { _, _ ->
                         removeFlagsAndExitApp()
@@ -292,6 +305,71 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         TODO("Not yet implemented")
+    }
+
+    private fun insertWeatherInfoInDB(weatherResponse: WeatherResponse) {
+        weatherBox.removeAll()
+        forecastBox.removeAll()
+
+        val location = weatherResponse.location
+        val current = weatherResponse.current
+        val condition = current.condition
+        val forecastDays = weatherResponse.forecast.forecastDay
+        val dateTime = dateTimeSplitter(location.dateTime)
+
+        weatherBox.put(Weather(0, location.name,
+            dateFormat(dateTime[0]),
+            timeFormat(dateTime[1]),
+            current.isDay,
+            temperatureFormat(current.temperature),
+            condition.text,
+            condition.code)
+        )
+
+        weather = weatherBox.query().build().findFirst()!!
+
+        for (forecast in forecastDays) {
+            val day = forecast.day
+            val dayCondition = day.condition
+
+            forecastBox.put(Forecast(0, weather.id,
+                forecast.date, getDay(forecast.date),
+                temperatureFormatNoMeasure(day.maxTemp),
+                temperatureFormatNoMeasure(day.minTemp),
+                dayCondition.text,
+                dayCondition.code)
+            )
+        }
+
+        setHeaderInfo()
+        loadPrincipalCardInformation()
+        loadWeather()
+    }
+
+    private fun attachObservers() {
+        weatherViewModel.isLoading.observe(this, {
+
+            if (it != null)
+            // Using "root" after component name to call view reference
+                enableLoading(binding.frameLoading.root, VISIBLE, it)
+            else
+            // Using "root" after component name to call view reference
+                enableLoading(binding.frameLoading.root, INVISIBLE)
+        })
+
+        weatherViewModel.weatherSuccess.observe(this, { response ->
+
+            if (response != null)
+                insertWeatherInfoInDB(response)
+        })
+
+        weatherViewModel.weatherFailure.observe(this, { throwable ->
+
+            if (throwable != null) {
+                HelperUtil().parseError(throwable, this)
+                weatherViewModel.weatherFailure.postValue(null)
+            }
+        })
     }
 
     override fun onBackPressed() {
