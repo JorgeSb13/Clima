@@ -113,11 +113,10 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/ivLocation"
             app:layout_constraintEnd_toStartOf="@id/clWeather"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/ivLocation"
-            app:layout_constraintTop_toTopOf="@id/ivLocation" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clWeather"

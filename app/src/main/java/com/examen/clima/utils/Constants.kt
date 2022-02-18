@@ -13,6 +13,7 @@ class Constants {
         const val FACEBOOK = 15
 
         const val LOCATION_REQ_CODE = 44
+        const val LOCATION_EXTRA = "locationExtra"
 
         // ----- Google -----
         const val RC_SIGN_IN = 100

@@ -55,8 +55,6 @@ class SplashActivity : AppCompatActivity() {
 
         // Login with Facebook
         cvFacebook.setOnClickListener {
-            toast("Función de Facebook")
-
             //TODO Al entrar con la sesion se debe activar bandera @hasEntered y @isLogged
         }
 

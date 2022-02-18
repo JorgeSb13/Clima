@@ -9,8 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
+import android.view.View.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
@@ -23,15 +22,13 @@ import com.examen.clima.App.Companion.mGoogleSignInClient
 import com.examen.clima.adapters.WeatherAdapter
 import com.examen.clima.databinding.ActivityMainBinding
 import com.examen.clima.databinding.NavHeaderBinding
-import com.examen.clima.entities.Forecast
-import com.examen.clima.entities.Ubi
-import com.examen.clima.entities.Weather
-import com.examen.clima.entities.WeatherCondition_
+import com.examen.clima.entities.*
 import com.examen.clima.models.WeatherResponse
 import com.examen.clima.network.HelperUtil
 import com.examen.clima.utils.*
 import com.examen.clima.utils.Constants.Companion.FACEBOOK
 import com.examen.clima.utils.Constants.Companion.GOOGLE
+import com.examen.clima.utils.Constants.Companion.LOCATION_EXTRA
 import com.examen.clima.utils.Constants.Companion.LOCATION_REQ_CODE
 import com.examen.clima.utils.Constants.Companion.TAG_LOCATION
 import com.examen.clima.viewModels.WeatherViewModel
@@ -55,6 +52,8 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
     private var ubi: Ubi? = null
     private lateinit var weather: Weather
 
+    private var anotherLocationFlag = false
+
     // Location functionality
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
@@ -73,10 +72,17 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         getLocationPermission()
 
-        // Load screen information
+        // ----- Load screen information -----
         ubi = locationBox.query().build().findFirst()
         val location = ubi!!.locality.split(" ")
-        weatherViewModel.getWeather(location[0])
+
+        // ----- Search weather from another location -----
+        val locationExtra = intent.getStringExtra(LOCATION_EXTRA)
+        if (locationExtra != null) {
+            anotherLocationFlag = true
+            weatherViewModel.getWeather(locationExtra)
+        } else
+            weatherViewModel.getWeather(location[0])
 
         // Load the lateral menu
         setNavDrawer()
@@ -93,6 +99,14 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
             binding.srlRefreshScreen.isRefreshing = false
         }
         // -----------------------------
+
+        // ----- Search function -----
+        binding.ivSearch.setOnClickListener {
+            val search = binding.etSearch.text.toString()
+
+            if (search != "")
+                weatherViewModel.searchLocation(search)
+        }
     }
 
     private fun setNavDrawer() {
@@ -133,7 +147,12 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         // ----------------------------------------------
 
         // ---- Set the information about the weather ---
-        if (ubi != null) navBinding.tvCity.text = ubi!!.locality
+        if (anotherLocationFlag) {
+            navBinding.ivLocation.visibility = GONE
+            navBinding.tvCity.text = weather.name
+        } else
+            if (ubi != null) navBinding.tvCity.text = ubi!!.locality
+
         navBinding.tvTemperature.text = weather.temperature
 
         // Assign day or night for the corresponding image
@@ -149,10 +168,14 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
     }
 
     private fun loadPrincipalCardInformation() {
-        if (ubi != null) {
-            binding.ivLocation.visibility = VISIBLE
-            binding.tvCity.text = "${ubi!!.locality}, ${ubi!!.state}"
-        }
+
+        if (anotherLocationFlag)
+            binding.tvCity.text = weather.name
+        else
+            if (ubi != null) {
+                binding.ivLocation.visibility = VISIBLE
+                binding.tvCity.text = "${ubi!!.locality}, ${ubi!!.state}"
+            }
 
         val weatherCondition = weatherConditionBox.query().equal(WeatherCondition_.id, weather.code.toLong())
             .build().findFirst()!!
@@ -184,20 +207,6 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         recycler.adapter = adapter
     }
 
-    // ----- Add button action -----
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_add, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == R.id.add) {
-            // TODO Funcion de añadir nueva localizacion
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     // ----- Sign in function -----
     private fun signInWithAccount() {
         alertDialog(this, getString(R.string.ad_sign_in_title), getString(R.string.ad_sign_in_message), getString(R.string.accept), { _, _ ->
@@ -209,11 +218,8 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
     private fun signOut() {
         val user = userBox.query().build().findFirst()
 
-        alertDialog(
-            this,
-            getString(R.string.ad_sign_out_title),
-            getString(R.string.ad_sign_out_message),
-            getString(R.string.accept),
+        alertDialog(this, getString(R.string.ad_sign_out_title),
+            getString(R.string.ad_sign_out_message), getString(R.string.accept),
             { _, _ ->
 
                 when (user!!.socialMedia) {
@@ -317,7 +323,9 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         val forecastDays = weatherResponse.forecast.forecastDay
         val dateTime = dateTimeSplitter(location.dateTime)
 
-        weatherBox.put(Weather(0, location.name,
+        val name = if (anotherLocationFlag) "${location.name}, ${location.region}" else location.name
+
+        weatherBox.put(Weather(0, name,
             dateFormat(dateTime[0]),
             timeFormat(dateTime[1]),
             current.isDay,
@@ -364,6 +372,28 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         })
 
         weatherViewModel.weatherFailure.observe(this, { throwable ->
+
+            if (throwable != null) {
+                HelperUtil().parseError(throwable, this)
+                weatherViewModel.weatherFailure.postValue(null)
+            }
+        })
+
+        weatherViewModel.searchSuccess.observe(this, { response ->
+
+            if (response != null) {
+                searchBox.removeAll()
+
+                for (search in response)
+                    searchBox.put(Search(search.id.toLong(), search.name, search.region, search.country))
+
+                goToActivity<SearchActivity>()
+                transitionLeft()
+            }
+        })
+
+        weatherViewModel.searchFailure.observe(this, { throwable ->
+            searchBox.removeAll()
 
             if (throwable != null) {
                 HelperUtil().parseError(throwable, this)

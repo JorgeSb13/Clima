@@ -13,6 +13,8 @@ class WeatherResponse(
     class Location(
         @SerializedName("name")
         internal var name: String,
+        @SerializedName("region")
+        internal var region: String,
         @SerializedName("localtime")
         internal var dateTime: String
     )

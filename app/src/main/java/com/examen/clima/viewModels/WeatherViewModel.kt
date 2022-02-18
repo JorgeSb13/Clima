@@ -16,7 +16,7 @@ class WeatherViewModel : ViewModel() {
     var weatherSuccess = MutableLiveData<WeatherResponse>()
     var weatherFailure = MutableLiveData<Throwable>()
 
-    var searchSuccess = MutableLiveData<SearchResponse>()
+    var searchSuccess = MutableLiveData<ArrayList<SearchResponse>>()
     var searchFailure = MutableLiveData<Throwable>()
 
     fun getWeather(location: String) {
@@ -39,7 +39,7 @@ class WeatherViewModel : ViewModel() {
         isLoading.value = App.context!!.resources.getString(R.string.loading_searching)
 
         weatherRepository.searchLocationRequest(location, object : WeatherRepository.SearchInterface {
-            override fun success(response: SearchResponse) {
+            override fun success(response: ArrayList<SearchResponse>) {
                 isLoading.value = null
                 searchSuccess.value = response
             }

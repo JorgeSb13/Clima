@@ -13,6 +13,9 @@
     <!-- Main screen activity -->
     <string name="lbl_search_location">Buscar localización</string>
 
+    <!-- Search screen activity -->
+    <string name="lbl_no_locations_found">No se encontraron localizaciones</string>
+
     <!-- Navigation header -->
     <string name="lbl_guest">Invitado del clima</string>
 
@@ -34,6 +37,8 @@
     <string name="ad_location_permission_title">Permisos de ubicación</string>
     <string name="ad_location_permission_message">Acceder a la ubicación del dispositivo es necesario para
         el funcionamiento de la aplicación, acepte los permisos necesarios.</string>
+    <string name="ad_see_location_title">Clima</string>
+    <string name="ad_see_location_message">¿Desea ver el clima de %s?</string>
 
     <!-- Errors -->
     <string name="error_location">Location could not be obtained</string>

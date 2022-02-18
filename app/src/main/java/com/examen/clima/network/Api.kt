@@ -20,5 +20,5 @@ interface Api {
     @GET("search.json?key=${API_KEY}")
     fun searchLocation(
         @Query("q") location: String
-    ): Observable<SearchResponse>
+    ): Observable<ArrayList<SearchResponse>>
 }

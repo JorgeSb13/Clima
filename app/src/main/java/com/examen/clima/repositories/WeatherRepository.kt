@@ -15,7 +15,7 @@ class WeatherRepository {
     }
 
     interface SearchInterface {
-        fun success(response: SearchResponse)
+        fun success(response: ArrayList<SearchResponse>)
         fun failure(throwable: Throwable)
     }
 
@@ -51,8 +51,8 @@ class WeatherRepository {
                 response
             }
             .subscribe(
-                object : ResourceObserver<SearchResponse>() {
-                    override fun onNext(response: SearchResponse) {
+                object : ResourceObserver<ArrayList<SearchResponse>>() {
+                    override fun onNext(response: ArrayList<SearchResponse>) {
                         searchInterface.success(response)
                     }
 

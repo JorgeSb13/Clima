@@ -27,6 +27,7 @@ val userBox: Box<User> by lazy { App.userBox!! }
 val locationBox: Box<Ubi> by lazy { App.locationBox!! }
 val weatherBox: Box<Weather> by lazy { App.weatherBox!! }
 val forecastBox: Box<Forecast> by lazy { App.forecastBox!! }
+val searchBox: Box<Search> by lazy { App.searchBox!! }
 // ----- CATALOGS ------
 val weatherConditionBox: Box<WeatherCondition> by lazy { App.weatherConditionBox!! }
 
@@ -45,6 +46,7 @@ class App : Application() {
         var locationBox: Box<Ubi>? = null
         var weatherBox: Box<Weather>? = null
         var forecastBox: Box<Forecast>? = null
+        var searchBox: Box<Search>? = null
         // ----- CATALOGS ------
         var weatherConditionBox: Box<WeatherCondition>? = null
     }
@@ -63,15 +65,18 @@ class App : Application() {
         locationBox = boxStore!!.boxFor(Ubi::class.java)
         weatherBox = boxStore!!.boxFor(Weather::class.java)
         forecastBox = boxStore!!.boxFor(Forecast::class.java)
+        searchBox = boxStore!!.boxFor(Search::class.java)
         // ----- CATALOGS ------
         weatherConditionBox = boxStore!!.boxFor(WeatherCondition::class.java)
         fillWeatherConditions()
 
         //Starting ObjectBox Data Browser (ONLY FOR TEST!!!)
+
         if (BuildConfig.DEBUG) {
             val started = AndroidObjectBrowser(boxStore).start(this)
             Log.i("ObjectBrowser", "Started: $started")
         }
+
 
         // ----- Implemented and used for consuming APIs -----
 
