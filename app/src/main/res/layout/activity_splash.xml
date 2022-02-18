@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="60dp"
+        android:visibility="gone"
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0.8"
-            android:background="@color/base_light">
+            android:background="@color/base">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -46,8 +47,8 @@
                     android:id="@+id/cvGoogle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="10dp"
                     android:backgroundTint="@color/white"
+                    app:cardCornerRadius="10dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -91,6 +92,7 @@
                     android:layout_marginBottom="3dp"
                     android:backgroundTint="@color/white"
                     app:cardCornerRadius="10dp"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

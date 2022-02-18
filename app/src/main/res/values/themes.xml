@@ -12,6 +12,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -27,5 +28,10 @@
     <style name="MyTitleTextStyle">
         <item name="android:textColor">@color/base</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
+
+    <!-- Used for overwrite the default color when you hold press the item in nav -->
+    <style name="MyNavDrawerStyle">
+        <item name="colorControlHighlight">@android:color/transparent</item>
     </style>
 </resources>

@@ -1,0 +1,235 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "2:3750664304265355730",
+      "lastPropertyId": "5:7280317104044342009",
+      "name": "Usuario",
+      "properties": [
+        {
+          "id": "1:8831343640955879800",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5806913537168238292",
+          "name": "Nombre",
+          "type": 9
+        },
+        {
+          "id": "3:1326191847555913433",
+          "name": "Correo",
+          "type": 9
+        },
+        {
+          "id": "5:7280317104044342009",
+          "name": "Red_social",
+          "type": 5
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:2207056617026446796",
+      "lastPropertyId": "4:6839162366686589295",
+      "name": "Ubicacion",
+      "properties": [
+        {
+          "id": "1:7165003945392692322",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:3286627183900149342",
+          "name": "Localidad",
+          "type": 9
+        },
+        {
+          "id": "3:603624230131217264",
+          "name": "Estado",
+          "type": 9
+        },
+        {
+          "id": "4:6839162366686589295",
+          "name": "Pais",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "4:2642041787236964393",
+      "lastPropertyId": "8:2741004886173533223",
+      "name": "Clima_actual",
+      "properties": [
+        {
+          "id": "1:5243417809117720626",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:7157636537554992495",
+          "name": "Nombre",
+          "type": 9
+        },
+        {
+          "id": "3:5559132637152342015",
+          "name": "Fecha",
+          "type": 9
+        },
+        {
+          "id": "4:1369566933623981807",
+          "name": "Hora",
+          "type": 9
+        },
+        {
+          "id": "5:4717892209292114736",
+          "name": "Temperatura",
+          "type": 9
+        },
+        {
+          "id": "6:6074787549440705391",
+          "name": "Cond_clima",
+          "type": 9
+        },
+        {
+          "id": "7:183363051429835927",
+          "name": "Codigo",
+          "type": 5
+        },
+        {
+          "id": "8:2741004886173533223",
+          "name": "Es_dia",
+          "type": 5
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "5:724703357802924561",
+      "lastPropertyId": "8:6093604569619185988",
+      "name": "Pronostico_futuro",
+      "properties": [
+        {
+          "id": "1:4281876536479383035",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:6792498039232327362",
+          "name": "id_localizacion",
+          "type": 6
+        },
+        {
+          "id": "3:7972190936665724839",
+          "name": "Fecha",
+          "type": 9
+        },
+        {
+          "id": "4:9141143128304913352",
+          "name": "Dia",
+          "type": 9
+        },
+        {
+          "id": "5:4622543088833650000",
+          "name": "Temp_max",
+          "type": 9
+        },
+        {
+          "id": "6:2419354635459472369",
+          "name": "Temp_min",
+          "type": 9
+        },
+        {
+          "id": "7:3891509438461113953",
+          "name": "Cond_clima",
+          "type": 9
+        },
+        {
+          "id": "8:6093604569619185988",
+          "name": "Codigo",
+          "type": 5
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "6:1049790827368073196",
+      "lastPropertyId": "3:3989708412033731139",
+      "name": "Condicion_clima",
+      "properties": [
+        {
+          "id": "1:7013244613628132264",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:8695958102705229806",
+          "name": "Condicion",
+          "type": 9
+        },
+        {
+          "id": "3:3989708412033731139",
+          "name": "Icono",
+          "type": 9
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "7:6215190823376701059",
+      "lastPropertyId": "4:4263811234032845256",
+      "name": "Busqueda",
+      "properties": [
+        {
+          "id": "1:9046903903807124029",
+          "name": "id",
+          "type": 6,
+          "flags": 129
+        },
+        {
+          "id": "2:5496643170376033668",
+          "name": "Localidad",
+          "type": 9
+        },
+        {
+          "id": "3:5065877755138157257",
+          "name": "Region",
+          "type": 9
+        },
+        {
+          "id": "4:4263811234032845256",
+          "name": "Pais",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "7:6215190823376701059",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    3679024025908515344
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    8323997344438203286,
+    2260631332262332787,
+    2961112089923063141,
+    2321145676605724123,
+    1879583896933028743
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}
