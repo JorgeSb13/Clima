@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import com.examen.clima.App
 import com.examen.clima.R
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 fun toast(message: CharSequence, duration: Int = Toast.LENGTH_SHORT) =
     Toast.makeText(App.context, message, duration).show()
@@ -186,6 +186,14 @@ fun getDay(date: String): String {
             else -> "X"
         }
     }
+}
+
+fun timezoneFormat(timezoneId: String): String {
+    val timezone = TimeZone.getTimeZone(timezoneId)
+    val gmtOffset = timezone.rawOffset
+    val value = TimeUnit.HOURS.convert(gmtOffset.toLong(), TimeUnit.MILLISECONDS)
+
+    return if (value > 0) "GMT+$value" else "GMT$value"
 }
 
 fun View.getImage(name: String) = resources.getIdentifier(name, "drawable", App.context!!.packageName)

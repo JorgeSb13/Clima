@@ -2,7 +2,6 @@ package com.examen.clima
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import com.examen.clima.BuildConfig.BASE_URL
 import com.examen.clima.entities.*
 import com.examen.clima.network.Api
@@ -10,7 +9,6 @@ import com.examen.clima.utils.Constants
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import io.objectbox.Box
 import io.objectbox.BoxStore
-import io.objectbox.android.AndroidObjectBrowser
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -71,12 +69,12 @@ class App : Application() {
         fillWeatherConditions()
 
         //Starting ObjectBox Data Browser (ONLY FOR TEST!!!)
-
+        /*
         if (BuildConfig.DEBUG) {
             val started = AndroidObjectBrowser(boxStore).start(this)
             Log.i("ObjectBrowser", "Started: $started")
         }
-
+        */
 
         // ----- Implemented and used for consuming APIs -----
 

@@ -7,7 +7,6 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View.*
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -51,6 +50,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
     private var ubi: Ubi? = null
     private lateinit var weather: Weather
+    private var timezoneId = ""
 
     private var anotherLocationFlag = false
 
@@ -73,16 +73,23 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         getLocationPermission()
 
         // ----- Load screen information -----
-        ubi = locationBox.query().build().findFirst()
-        val location = ubi!!.locality.split(" ")
+        lateinit var location: List<String>
 
         // ----- Search weather from another location -----
         val locationExtra = intent.getStringExtra(LOCATION_EXTRA)
         if (locationExtra != null) {
             anotherLocationFlag = true
             weatherViewModel.getWeather(locationExtra)
-        } else
-            weatherViewModel.getWeather(location[0])
+            ubi = locationBox.query().build().findFirst()
+            location = ubi!!.locality.split(" ")
+
+        } else {
+            ubi = locationBox.query().build().findFirst()
+            if (ubi != null) {
+                location = ubi!!.locality.split(" ")
+                weatherViewModel.getWeather(location[0])
+            }
+        }
 
         // Load the lateral menu
         setNavDrawer()
@@ -93,6 +100,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
 
         // ----- Swipe to refresh information function -----
         binding.srlRefreshScreen.setOnRefreshListener {
+            anotherLocationFlag = false
             binding.etSearch.text.clear()
 
             weatherViewModel.getWeather(location[0])
@@ -181,7 +189,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
             .build().findFirst()!!
 
         binding.tvDateTime.text = dateTimeFormat(weather.date, weather.time)
-        binding.tvTimeZone.text = getTimeZone()
+        binding.tvTimeZone.text = timezoneFormat(timezoneId)
         binding.tvTemperature.text = weather.temperature
         binding.tvWeatherCondition.text = weatherCondition.condition
 
@@ -265,6 +273,15 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
             locationBox.removeAll()
             locationBox.put(Ubi(0, address[0].locality, address[0].adminArea, address[0].countryName))
 
+            // Validate the existence of the current location
+            if (!prefHelper.hasLocation) {
+                prefHelper.hasLocation = true
+
+                ubi = locationBox.query().build().findFirst()
+                val searchFor = address[0].locality.split(" ")
+                weatherViewModel.getWeather(searchFor[0])
+            }
+
         } catch (e: Exception) {
             Log.w(TAG_LOCATION, getString(R.string.error_location))
         }
@@ -324,6 +341,7 @@ class MainActivity : ToolbarActivity(), NavigationView.OnNavigationItemSelectedL
         val dateTime = dateTimeSplitter(location.dateTime)
 
         val name = if (anotherLocationFlag) "${location.name}, ${location.region}" else location.name
+        timezoneId = location.tzId
 
         weatherBox.put(Weather(0, name,
             dateFormat(dateTime[0]),

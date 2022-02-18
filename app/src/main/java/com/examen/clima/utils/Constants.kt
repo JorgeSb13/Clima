@@ -22,6 +22,7 @@ class Constants {
         const val SHARED_FILE_NAME = "share_preferences_file"
         const val KEY_HAS_ENTERED = "hasEntered"
         const val KEY_IS_LOGGED = "isLogged"
+        const val KEY_HAS_LOCATION = "hasLocation"
 
         // ----- TAGs -----
         const val TAG_LOCATION = "Location"

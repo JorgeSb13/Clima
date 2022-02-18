@@ -5,6 +5,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\Jorge Stone\\AndroidStudioProjects\\KeyWarehouse\\key_store_clima.jks')
+            storePassword 'jorgestone13'
+            keyAlias 'key_clima'
+            keyPassword 'jorgestone13'
+        }
+    }
     compileSdkVersion 31
     buildToolsVersion "31.0.0"
 
@@ -28,6 +36,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // -------- API --------
             buildConfigField("String", "BASE_URL", '"http://api.weatherapi.com/v1/"')
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {

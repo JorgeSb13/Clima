@@ -15,6 +15,8 @@ class WeatherResponse(
         internal var name: String,
         @SerializedName("region")
         internal var region: String,
+        @SerializedName("tz_id")
+        internal var tzId: String,
         @SerializedName("localtime")
         internal var dateTime: String
     )
